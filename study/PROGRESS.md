@@ -14,7 +14,7 @@
 | 课次 | 主题 | 状态 | Handoff | 学习记录 |
 |---|---|---|---|---|
 | 0000 | 学习工作区初始化 | 已完成 | handoffs/0000-initial-study-setup.md | 暂不需要 |
-| 0001 | Pi Agent Loop 源码精读 | 未开始 | 待生成 | 待验证 |
+| 0001 | Pi Agent Loop 源码精读 | 进行中 | 待生成 | 待验证 |
 | 0002 | AgentMessage vs LLM Message | 未开始 | 待生成 | 待验证 |
 | 0003 | Tool Call 执行链路 | 未开始 | 待生成 | 待验证 |
 | 0004 | AgentHarness 是 Runtime 控制层 | 未开始 | 待生成 | 待验证 |
