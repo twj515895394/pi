@@ -14,7 +14,7 @@
 | 课次 | 主题 | 状态 | Handoff | 学习记录 |
 |---|---|---|---|---|
 | 0000 | 学习工作区初始化 | 已完成 | handoffs/0000-initial-study-setup.md | 暂不需要 |
-| 0001 | Pi Agent Loop 源码精读 | 进行中 | 待生成 | 待验证 |
+| 0001 | Pi Agent Loop 源码精读 | 已完成 | handoffs/0001-pi-agent-loop.md | learning-records/0001-agent-loop-is-model-tool-observation-cycle.md |
 | 0002 | AgentMessage vs LLM Message | 未开始 | 待生成 | 待验证 |
 | 0003 | Tool Call 执行链路 | 未开始 | 待生成 | 待验证 |
 | 0004 | AgentHarness 是 Runtime 控制层 | 未开始 | 待生成 | 待验证 |
@@ -29,6 +29,10 @@
 | 0013 | Capstone Project | 未开始 | 待生成 | 待验证 |
 | 0014 | AI Coding Agent 横向对比 | 未开始 | 待生成 | 待验证 |
 | 0015 | 阶段复盘与下一步 | 未开始 | 待生成 | 待验证 |
+
+## 下一步
+
+进入第二课：`0002 AgentMessage vs LLM Message`。
 
 ## 每课结束必须更新
 
