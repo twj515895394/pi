@@ -8,13 +8,17 @@
 
 ## 当前状态
 
-未开始。
+进行中。
 
-已完成的工作：
+已经开始第一课，当前要读懂：
 
-- 初始化 `study/` 学习工作区。
-- 建立课程路线图、源码阅读地图、练习规划。
-- 建立进度记录与 handoff 机制。
+```text
+Agent.prompt()
+  -> runPromptMessages()
+  -> createContextSnapshot()
+  -> createLoopConfig()
+  -> runAgentLoop()
+```
 
 ## 最新 Handoff
 
@@ -22,15 +26,22 @@
 study/handoffs/0000-initial-study-setup.md
 ```
 
-## 下一步
-
-开始第一课：
+第一课完成前暂时没有 `0001` handoff。课程结束后必须生成：
 
 ```text
-study/course-design/0001-pi-agent-loop.md
-study/lessons/0001-pi-agent-loop.html
-study/reference/pi-agent-loop-sequence.md
+study/handoffs/0001-pi-agent-loop.md
 ```
+
+## 当前源码范围
+
+```text
+packages/agent/src/agent.ts
+packages/agent/src/agent-loop.ts
+packages/agent/src/types.ts
+packages/agent/README.md
+```
+
+## 当前问题
 
 第一课要解决的问题：
 
@@ -48,4 +59,4 @@ study/reference/pi-agent-loop-sequence.md
 4. `study/handoffs/0000-initial-study-setup.md`
 5. `study/course-design/0001-pi-agent-loop.md`
 
-然后从第一课开始。
+然后继续第一课。
