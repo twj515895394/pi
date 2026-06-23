@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>0002：AgentMessage vs LLM Message</title>
+  <link rel="stylesheet" href="../assets/lesson-style.css" />
+</head>
+<body>
+  <main>
+    <h1>0002：AgentMessage vs LLM Message</h1>
+    <p class="note">状态：已完成。对应参考资料：<a href="../reference/agent-message-vs-llm-message.md">agent-message-vs-llm-message.md</a></p>
+
+    <section class="card">
+      <h2>本课目标</h2>
+      <p>理解 Pi 为什么要区分内部消息模型和 LLM 消息模型，并掌握 <code>convertToLlm</code> 的边界意义。</p>
+    </section>
+
+    <section>
+      <h2>核心结论</h2>
+      <pre><code>AgentMessage = Agent 内部完整消息账本
+LLM Message  = LLM Provider 接口 DTO</code></pre>
+      <p>AgentMessage 服务 Agent Runtime，LLM Message 服务模型接口。两者不能混为一谈。</p>
+    </section>
+
+    <section>
+      <h2>为什么要分层</h2>
+      <p>Agent 内部不仅有 user、assistant、toolResult，还可能有 UI 状态、审计事件、权限决策、业务状态、bash 执行记录、分支摘要和压缩摘要。</p>
+      <p>这些消息不一定都该进入模型，所以 Pi 使用 <code>convertToLlm</code> 作为边界转换器。</p>
+    </section>
+
+    <section>
+      <h2>源码锚点</h2>
+      <pre><code>packages/agent/src/types.ts
+packages/agent/src/agent.ts
+packages/agent/src/agent-loop.ts
+packages/agent/src/harness/messages.ts</code></pre>
+    </section>
+
+    <section>
+      <h2>基础层默认转换</h2>
+      <pre><code>defaultConvertToLlm(messages)
+  -> keep user
+  -> keep assistant
+  -> keep toolResult
+  -> filter others</code></pre>
+      <p>基础 Agent 默认只让模型看到标准协议消息。</p>
+    </section>
+
+    <section>
+      <h2>Harness 层扩展消息</h2>
+      <ul>
+        <li><code>bashExecution</code>：记录命令、输出、exitCode、截断状态等。</li>
+        <li><code>custom</code>：可显示或可转换的自定义消息。</li>
+        <li><code>branchSummary</code>：分支返回后的摘要。</li>
+        <li><code>compactionSummary</code>：历史压缩后的摘要。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>四个判断维度</h2>
+      <pre><code>1. 是否写入 session？
+2. 是否展示给用户？
+3. 是否进入 LLM？
+4. 是否影响工具调用或控制流？</code></pre>
+    </section>
+
+    <section>
+      <h2>企业 Agent 设计原则</h2>
+      <ul>
+        <li>用户消息通常进入 LLM。</li>
+        <li>assistant 消息通常进入 LLM。</li>
+        <li>工具观察结果通常进入 LLM，但要压缩或脱敏。</li>
+        <li>UI 状态默认不进入 LLM。</li>
+        <li>审计和权限原始事件默认不进入 LLM。</li>
+        <li>会影响模型下一步行为的业务结论，可以转换后进入 LLM。</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>本课检查结果</h2>
+      <p>用户已经能解释 AgentMessage 与 LLM Message 的职责边界，能判断 branchSummary、compactionSummary、bashExecution、AuditEventMessage、ClearanceStatusMessage 是否以及如何进入 LLM。</p>
+    </section>
+
+    <section>
+      <h2>课后复习</h2>
+      <ul>
+        <li><a href="../reference/agent-message-vs-llm-message.md">AgentMessage vs LLM Message 参考资料</a></li>
+        <li><a href="../handoffs/0002-agent-message-vs-llm-message.md">本课 Handoff</a></li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
