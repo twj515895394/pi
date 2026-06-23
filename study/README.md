@@ -1,52 +1,107 @@
 # Pi Agent Harness 学习工作区
 
-这个目录用于记录围绕 Pi 项目的 Agent Harness 学习过程。它不是项目官方文档的替代品，而是个人学习工作区：记录为什么学、怎么学、读哪些源码、做哪些练习、何时形成学习记录。
+这是 Pi 项目中的个人学习工作区，用于持续学习底层 Agent Runtime / Agent Harness 工程。
 
-## 学习目标
+任何 Agent 或新会话进入本目录后，应把本文件当作主入口。
 
-从已有的 Dify / Java + Dify 接口型 Agent 经验，升级到底层 Agent Harness 工程能力：能够读懂、设计、改造和实现可控、可观测、可扩展的 Agent Runtime。
+## 这个工作区是干什么的
 
-## 目录结构
+目标是把已有的 Dify / Java + Dify 接口型 Agent 经验，升级为能够读懂、设计、改造和实现 Agent Harness 的工程能力。
 
-```text
-study/
-├── README.md                    # 学习工作区说明
-├── MISSION.md                   # 学习使命：为什么学 Pi / Agent Harness
-├── LEARNING-WORKFLOW.md         # 学习节奏：如何上课、读源码、练习、复盘
-├── COURSE-ROADMAP.md            # 30 天路线图与课程分阶段设计
-├── SOURCE-READING-MAP.md        # Pi 源码阅读地图
-├── EXERCISES.md                 # 阶段性练习与验收标准
-├── RESOURCES.md                 # 高信任资源清单
-├── GLOSSARY.md                  # 术语表，仅在真正理解后加入术语
-├── NOTES.md                     # 教学偏好、临时笔记、待办
-├── course-design/               # 课程设计草案，每节课开始前先放这里
-├── lessons/                     # 正式课程材料，后续以 HTML 为主
-├── reference/                   # 速查表、架构图、参考文档
-├── learning-records/            # 学习记录，理解被验证后再写
-└── assets/                      # 课程可复用样式、图表、组件
-```
-
-## 使用原则
-
-1. **先使命，后课程**：每节课都要服务于 `MISSION.md`。
-2. **小切片学习**：每次只解决一个核心问题，例如 Agent Loop、Tool Call、Session、Compaction、Extension。
-3. **源码驱动**：课程必须绑定到具体源码路径，而不是只讲抽象概念。
-4. **练习验证理解**：能解释不等于掌握，能实现、能改造、能复盘才算掌握。
-5. **学习记录不写流水账**：只有当一个概念真正被理解或误区被纠正时，才写入 `learning-records/`。
-
-## 当前学习主线
+学习对象不是 Pi 的全部代码，而是围绕 Agent 工程主线切片学习：
 
 ```text
 Agent Loop
-  -> Agent State / Message Model
-  -> Tool Calling / Tool Execution
+  -> AgentMessage / LLM Message
+  -> Tool Call
   -> AgentHarness
-  -> Session / Tree / Compaction
+  -> Session / Compaction
   -> Extension / Skills
   -> Coding Agent CLI / SDK / RPC
   -> 企业级 Agent Harness 设计
 ```
 
-## 下一步
+## 新会话应该怎么继续
 
-从 `course-design/0001-pi-agent-loop.md` 开始，进入第一课：读懂一次 `prompt()` 如何进入 Agent Loop，并最终变成模型响应和工具调用。
+请按顺序阅读：
+
+```text
+study/README.md
+study/MISSION.md
+study/CURRENT.md
+study/PROGRESS.md
+最新的 study/handoffs/*.md
+```
+
+其中：
+
+- `CURRENT.md`：当前学习状态入口。
+- `PROGRESS.md`：全局课程进度表。
+- `handoffs/`：每节课结束后的交接文档。
+
+## 目录结构
+
+```text
+study/
+├── README.md                    # 工作区主入口
+├── MISSION.md                   # 学习使命
+├── CURRENT.md                   # 当前学习状态，新会话优先读
+├── PROGRESS.md                  # 全局学习进度总表
+├── HANDOFF-PROTOCOL.md          # 每课 handoff 规则
+├── LEARNING-WORKFLOW.md         # 学习节奏
+├── COURSE-ROADMAP.md            # 路线图
+├── COURSE-LIST.md               # 课程清单
+├── SOURCE-READING-MAP.md        # 源码阅读地图
+├── EXERCISES.md                 # 阶段练习
+├── RESOURCES.md                 # 高信任资源
+├── GLOSSARY.md                  # 术语表，理解后再写入
+├── NOTES.md                     # 偏好和临时笔记
+├── handoffs/                    # 每课交接文档
+├── course-design/               # 课程草案
+├── lessons/                     # 正式课程材料，HTML 为主
+├── reference/                   # 复习用参考资料
+├── learning-records/            # 被验证后的学习记录
+├── templates/                   # 模板
+├── exercises/                   # 练习实现与复盘
+└── assets/                      # 课程复用资产
+```
+
+## 学习流程
+
+```text
+课程设计
+  -> 源码精读
+  -> 概念解释
+  -> 小练习
+  -> 理解检查
+  -> 更新 reference
+  -> 更新 progress/current/handoff
+  -> 必要时写 learning-record
+```
+
+## 每节课结束后的强制更新
+
+每节课结束后必须更新：
+
+```text
+study/PROGRESS.md
+study/CURRENT.md
+study/handoffs/<lesson-id>.md
+study/reference/<对应参考资料>.md
+```
+
+只有当用户真正展示理解时，才写入：
+
+```text
+study/learning-records/<next-id>-<slug>.md
+```
+
+## 当前下一步
+
+当前下一步是开始第一课：
+
+```text
+study/course-design/0001-pi-agent-loop.md
+```
+
+第一课目标：读懂一次 `prompt()` 如何进入 Agent Loop，并最终变成模型响应、工具调用、工具结果回灌和下一轮模型调用。
