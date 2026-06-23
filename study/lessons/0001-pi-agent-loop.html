@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>0001：Pi Agent Loop 源码精读</title>
+  <link rel="stylesheet" href="../assets/lesson-style.css" />
+</head>
+<body>
+  <main>
+    <h1>0001：Pi Agent Loop 源码精读</h1>
+    <p class="note">状态：占位课程。正式内容将在上课时根据源码精读和互动反馈补全。</p>
+
+    <section class="card">
+      <h2>本课目标</h2>
+      <p>读懂一次用户输入如何进入 Pi 的 Agent Loop，并理解它如何变成模型响应、工具调用、工具结果回灌和下一轮模型调用。</p>
+    </section>
+
+    <section>
+      <h2>源码范围</h2>
+      <pre><code>packages/agent/src/agent.ts
+packages/agent/src/agent-loop.ts
+packages/agent/src/types.ts
+packages/agent/README.md</code></pre>
+    </section>
+
+    <section>
+      <h2>学习前置</h2>
+      <ul class="checklist">
+        <li>先阅读 study/course-design/0001-pi-agent-loop.md。</li>
+        <li>准备画出 prompt -> assistant -> tool -> result -> next turn 的时序图。</li>
+        <li>学习完成后更新 study/reference/pi-agent-loop-sequence.md。</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
