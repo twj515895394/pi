@@ -8,7 +8,7 @@
 
 ## 当前状态
 
-未开始。
+进行中。
 
 第一课 `0001：Pi Agent Loop 源码精读` 已完成。
 
@@ -39,18 +39,22 @@ study/handoffs/0001-pi-agent-loop.md
 - UI-only status 通常应在 `convertToLlm` 阶段过滤。
 - 工具执行事件名是 `tool_execution_start/update/end`。
 
-## 下一步
-
-进入第二课：
-
-```text
-study/course-design/0002-agent-message-vs-llm-message.md
-```
+## 当前问题
 
 第二课要解决的问题：
 
 ```text
 为什么 Pi 内部要保留 AgentMessage，而不是直接使用 LLM Message？
+```
+
+## 当前源码范围
+
+```text
+study/course-design/0002-agent-message-vs-llm-message.md
+packages/agent/src/types.ts
+packages/agent/src/agent.ts
+packages/agent/src/agent-loop.ts
+packages/agent/src/harness/messages.ts
 ```
 
 ## 新会话续接方式
@@ -63,4 +67,4 @@ study/course-design/0002-agent-message-vs-llm-message.md
 4. `study/PROGRESS.md`
 5. `study/handoffs/0001-pi-agent-loop.md`
 
-然后从第二课开始。
+然后继续第二课。
