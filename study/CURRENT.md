@@ -4,18 +4,19 @@
 
 ## 当前课程
 
-`0002`：AgentMessage vs LLM Message
+`0003`：Tool Call 执行链路
 
 ## 当前状态
 
-进行中。
+未开始。
 
 第一课 `0001：Pi Agent Loop 源码精读` 已完成。
+第二课 `0002：AgentMessage vs LLM Message` 已完成。
 
 ## 最新 Handoff
 
 ```text
-study/handoffs/0001-pi-agent-loop.md
+study/handoffs/0002-agent-message-vs-llm-message.md
 ```
 
 ## 已确认理解
@@ -23,38 +24,32 @@ study/handoffs/0001-pi-agent-loop.md
 用户已经理解：
 
 ```text
-外部输入 -> AgentMessage[] -> Agent Loop -> LLM Message[] -> assistant/toolCall -> toolResult message -> 下一轮 LLM
+AgentMessage = Agent 内部完整消息账本
+LLM Message  = LLM Provider 接口 DTO
+convertToLlm = 内部消息到模型协议的边界转换器
 ```
 
 用户已能解释：
 
-- `normalizePromptInput` 为什么存在。
-- `currentContext.messages` 与 `newMessages` 的区别。
-- tool result 为什么要回灌成 `toolResult message`。
-- `transformContext` 与 `convertToLlm` 的区别。
-- AgentLoop 为什么通过事件更新 Agent state。
+- `AgentMessage` 为什么比 `LLM Message` 范围更大。
+- `branchSummary` / `compactionSummary` 为什么转换后进入 LLM。
+- `bashExecution.excludeFromContext` 的作用。
+- `AuditEventMessage` 默认不应进入 LLM。
+- `ClearanceStatusMessage` 应按需转换后进入 LLM。
+- `PermissionDecisionMessage` 默认不进 LLM，只在安全结论影响下一步行为时转换给模型。
 
-## 已纠正误区
+## 下一步
 
-- UI-only status 通常应在 `convertToLlm` 阶段过滤。
-- 工具执行事件名是 `tool_execution_start/update/end`。
-
-## 当前问题
-
-第二课要解决的问题：
+进入第三课：
 
 ```text
-为什么 Pi 内部要保留 AgentMessage，而不是直接使用 LLM Message？
+study/course-design/0003-tool-call-execution.md
 ```
 
-## 当前源码范围
+第三课要解决的问题：
 
 ```text
-study/course-design/0002-agent-message-vs-llm-message.md
-packages/agent/src/types.ts
-packages/agent/src/agent.ts
-packages/agent/src/agent-loop.ts
-packages/agent/src/harness/messages.ts
+一次 assistant message 中的 toolCall 是如何被校验、拦截、执行、改写，并最终变成 toolResult message 的？
 ```
 
 ## 新会话续接方式
@@ -65,6 +60,6 @@ packages/agent/src/harness/messages.ts
 2. `study/MISSION.md`
 3. `study/CURRENT.md`
 4. `study/PROGRESS.md`
-5. `study/handoffs/0001-pi-agent-loop.md`
+5. `study/handoffs/0002-agent-message-vs-llm-message.md`
 
-然后继续第二课。
+然后从第三课开始。
