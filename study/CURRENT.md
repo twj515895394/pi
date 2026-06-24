@@ -4,19 +4,20 @@
 
 ## 当前课程
 
-`0003`：Tool Call 执行链路
+`0004`：AgentHarness 是 Runtime 控制层
 
 ## 当前状态
 
-进行中。
+未开始。
 
 第一课 `0001：Pi Agent Loop 源码精读` 已完成。
 第二课 `0002：AgentMessage vs LLM Message` 已完成。
+第三课 `0003：Tool Call 执行链路` 已完成。
 
 ## 最新 Handoff
 
 ```text
-study/handoffs/0002-agent-message-vs-llm-message.md
+study/handoffs/0003-tool-call-execution.md
 ```
 
 ## 已确认理解
@@ -24,35 +25,31 @@ study/handoffs/0002-agent-message-vs-llm-message.md
 用户已经理解：
 
 ```text
-AgentMessage = Agent 内部完整消息账本
-LLM Message  = LLM Provider 接口 DTO
-convertToLlm = 内部消息到模型协议的边界转换器
+LLM 只能提出 toolCall；
+Agent Runtime 才真正决定工具能不能执行、如何执行、结果如何治理和回灌。
 ```
 
 用户已能解释：
 
-- `AgentMessage` 为什么比 `LLM Message` 范围更大。
-- `branchSummary` / `compactionSummary` 为什么转换后进入 LLM。
-- `bashExecution.excludeFromContext` 的作用。
-- `AuditEventMessage` 默认不应进入 LLM。
-- `ClearanceStatusMessage` 应按需转换后进入 LLM。
-- `PermissionDecisionMessage` 默认不进 LLM，只在安全结论影响下一步行为时转换给模型。
+- 为什么 toolCall 不能直接执行 `tool.execute()`。
+- `prepareArguments` 与 `validateToolArguments` 的区别。
+- `beforeToolCall` block 后为什么仍要生成 error toolResult。
+- 并行执行时事件完成顺序和 toolResult message 顺序的区别。
+- `beforeToolCall` 与 `afterToolCall` 的职责边界。
+- 企业级 Tool Permission Layer 的最小检查项。
 
-## 当前问题
+## 下一步
 
-第三课要解决的问题：
+进入第四课：
 
 ```text
-一次 assistant message 中的 toolCall 是如何被校验、拦截、执行、改写，并最终变成 toolResult message 的？
+study/course-design/0004-agent-harness-runtime-control.md
 ```
 
-## 当前源码范围
+第四课要解决的问题：
 
 ```text
-study/course-design/0003-tool-call-execution.md
-packages/agent/src/agent-loop.ts
-packages/agent/src/types.ts
-packages/coding-agent/src/core/tools/index.ts
+AgentHarness 为什么不是简单封装 Agent，而是把模型、工具、消息、权限、事件、上下文和 UI/CLI/SDK 连接起来的 Runtime 控制层？
 ```
 
 ## 新会话续接方式
@@ -63,6 +60,6 @@ packages/coding-agent/src/core/tools/index.ts
 2. `study/MISSION.md`
 3. `study/CURRENT.md`
 4. `study/PROGRESS.md`
-5. `study/handoffs/0002-agent-message-vs-llm-message.md`
+5. `study/handoffs/0003-tool-call-execution.md`
 
-然后继续第三课。
+然后从第四课开始。
