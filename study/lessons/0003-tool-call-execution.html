@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>0003：Tool Call 执行链路</title>
+  <link rel="stylesheet" href="../assets/lesson-style.css" />
+</head>
+<body>
+  <main>
+    <h1>0003：Tool Call 执行链路</h1>
+    <p class="note">状态：已完成。对应参考资料：<a href="../reference/tool-call-lifecycle.md">tool-call-lifecycle.md</a></p>
+
+    <section class="card">
+      <h2>本课目标</h2>
+      <p>理解 Pi 中 tool call 从模型生成到工具执行、结果回灌的完整生命周期。</p>
+    </section>
+
+    <section>
+      <h2>核心结论</h2>
+      <pre><code>LLM 只能提出 toolCall；
+Agent Runtime 才真正决定工具能不能执行、怎么执行、结果如何治理和回灌。</code></pre>
+    </section>
+
+    <section>
+      <h2>源码范围</h2>
+      <pre><code>packages/agent/src/agent-loop.ts
+packages/agent/src/types.ts
+packages/coding-agent/src/core/tools/index.ts
+packages/coding-agent/src/core/tools/read.ts</code></pre>
+    </section>
+
+    <section>
+      <h2>主生命周期</h2>
+      <pre><code>assistant message contains toolCall
+  -> executeToolCalls()
+  -> choose sequential / parallel
+  -> emit tool_execution_start
+  -> prepareToolCall()
+      -> find tool
+      -> prepareArguments
+      -> validateToolArguments
+      -> beforeToolCall
+  -> executePreparedToolCall()
+      -> tool.execute(...)
+      -> optional tool_execution_update
+  -> finalizeExecutedToolCall()
+      -> afterToolCall
+  -> emit tool_execution_end
+  -> createToolResultMessage()
+  -> append to currentContext.messages
+  -> next LLM turn</code></pre>
+    </section>
+
+    <section>
+      <h2>prepare 阶段</h2>
+      <p><code>prepareToolCall</code> 是工具执行前的安全关口。它负责找工具、修正参数、校验参数，并执行 <code>beforeToolCall</code>。</p>
+      <pre><code>prepareArguments = 参数整理 / 兼容 / 修正
+validateToolArguments = Schema 校验 / 正式参数校验</code></pre>
+    </section>
+
+    <section>
+      <h2>beforeToolCall 与 afterToolCall</h2>
+      <ul>
+        <li><code>beforeToolCall</code>：执行前治理，适合权限、审批、风控、白名单、危险命令拦截。</li>
+        <li><code>afterToolCall</code>：执行后治理，适合脱敏、压缩、错误标准化、审计补充、结果改写。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>错误也要回灌</h2>
+      <p>工具不存在、参数不合法、权限拒绝、执行异常，都应该变成 error toolResult message，而不是静默跳过或只打印日志。</p>
+      <pre><code>role: "toolResult"
+isError: true
+content: [{ type: "text", text: "失败原因" }]</code></pre>
+    </section>
+
+    <section>
+      <h2>企业权限层检查清单</h2>
+      <pre><code>用户身份 / 角色 / 租户 / 部门
+工具权限 / 操作类型 / 数据归属
+资源范围 / 参数风险 / 上下文一致性
+审批状态 / 风控策略 / 审计信息</code></pre>
+    </section>
+
+    <section class="card">
+      <h2>本课检查结果</h2>
+      <p>用户已经能解释为什么 toolCall 不能直接执行，能区分 prepareArguments 与 validateToolArguments，能说明被 block 后为什么仍要生成 error toolResult，并能理解 beforeToolCall / afterToolCall 在企业 Agent 权限治理中的分工。</p>
+    </section>
+
+    <section>
+      <h2>课后复习</h2>
+      <ul>
+        <li><a href="../reference/tool-call-lifecycle.md">Tool Call 生命周期参考资料</a></li>
+        <li><a href="../handoffs/0003-tool-call-execution.md">本课 Handoff</a></li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
