@@ -9,6 +9,8 @@
 - 不喜欢泛泛讲理论，要能落到实际代码、练习和架构设计。
 - 需要持续对照已有经验：Java 后端、Dify、企业 AI 平台、Coding Agent、MCP。
 - 每次学习最好有明确产出，例如图、表、练习代码、复盘文档。
+- 对于类似 AgentHarness、Session、Compaction 这类内容多、新概念多、环节多的课程，默认使用结构化输出：分层表格、流程图、职责边界图、设计图、小结卡片。
+- 高概念密度课程应先给总览图，再分模块拆解，最后用企业场景回填；必要时可生成更美观的图片辅助理解。
 
 ## 当前关注点
 
@@ -20,9 +22,12 @@
 
 ## 待办
 
-- [ ] 完成第一课：Pi Agent Loop 源码精读。
-- [ ] 画出 prompt -> model -> tool call -> tool result -> next turn 的时序图。
-- [ ] 读完 `packages/agent/src/agent-loop.ts`。
+- [x] 完成第一课：Pi Agent Loop 源码精读。
+- [x] 画出 prompt -> model -> tool call -> tool result -> next turn 的时序图。
+- [x] 读完 `packages/agent/src/agent-loop.ts`。
+- [x] 完成第二课：AgentMessage vs LLM Message。
+- [x] 完成第三课：Tool Call 执行链路。
+- [x] 完成第四课：AgentHarness 是 Runtime 控制层。
 - [ ] 设计 Tool Audit Extension。
 - [ ] 设计 Bash Permission Extension。
 - [ ] 把 Java Debug Skill 做成可复用 Skill。
