@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>0004：AgentHarness 是 Runtime 控制层</title>
+  <link rel="stylesheet" href="../assets/lesson-style.css" />
+</head>
+<body>
+  <main>
+    <h1>0004：AgentHarness 是 Runtime 控制层</h1>
+    <p class="note">状态：已完成。对应参考资料：<a href="../reference/agent-harness-runtime-control.md">agent-harness-runtime-control.md</a></p>
+
+    <section class="card">
+      <h2>本课目标</h2>
+      <p>理解 AgentHarness 为什么不是简单封装 Agent，而是把模型、工具、消息、权限、事件、上下文、Session、Compaction、Branch Summary 和 UI/CLI/SDK 连接起来的 Runtime 控制层。</p>
+    </section>
+
+    <section>
+      <h2>核心分层</h2>
+      <table>
+        <thead><tr><th>层级</th><th>类比</th><th>职责</th></tr></thead>
+        <tbody>
+          <tr><td>AgentLoop</td><td>核心工作流函数</td><td>当前 run 内模型-工具闭环</td></tr>
+          <tr><td>Agent</td><td>有状态 Service</td><td>保存 messages / tools / streaming 状态</td></tr>
+          <tr><td>AgentHarness</td><td>应用运行容器</td><td>Session、模型、工具、资源、Hook、队列、Provider、长期上下文和事件治理</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Runtime 总览图</h2>
+      <pre><code>User / UI / CLI / SDK
+        |
+        v
+AgentHarness
+  - Session
+  - Model / ThinkingLevel
+  - Tools / ActiveTools
+  - Resources: Skills / PromptTemplates
+  - Queues: steer / followUp / nextTurn
+  - Hooks: context / tool_call / tool_result
+  - Provider Governance
+  - Compaction / Branch Summary
+  - Events: save_point / settled / queue_update
+        |
+        v
+AgentLoop
+  - LLM call
+  - toolCall detection
+  - tool execution
+  - toolResult back to messages
+        |
+        v
+LLM Provider / Tools</code></pre>
+    </section>
+
+    <section>
+      <h2>createTurnState 与 createContext</h2>
+      <p><code>createTurnState()</code> 组装富状态运行快照；<code>createContext()</code> 把它压缩成 AgentLoop 所需的最小上下文。</p>
+      <pre><code>TurnState:
+  session context
+  resources
+  session metadata
+  tools / activeTools
+  systemPrompt
+  model
+  thinkingLevel
+  streamOptions
+
+AgentContext:
+  systemPrompt
+  messages
+  tools</code></pre>
+    </section>
+
+    <section>
+      <h2>createLoopConfig 的作用</h2>
+      <p><code>createLoopConfig()</code> 是 Harness 到 AgentLoop 的适配器 / 注入器。</p>
+      <table>
+        <thead><tr><th>注入点</th><th>Harness 能力</th></tr></thead>
+        <tbody>
+          <tr><td>transformContext</td><td>context hook：上下文治理</td></tr>
+          <tr><td>beforeToolCall</td><td>tool_call hook：权限、审批、风控</td></tr>
+          <tr><td>afterToolCall</td><td>tool_result hook：脱敏、压缩、错误标准化</td></tr>
+          <tr><td>prepareNextTurn</td><td>flush session writes，重建 TurnState</td></tr>
+          <tr><td>getSteeringMessages</td><td>运行中插话队列</td></tr>
+          <tr><td>getFollowUpMessages</td><td>后续消息队列</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>企业清关 Agent Harness 示例</h2>
+      <pre><code>入口控制：用户请求合法性、租户、用户身份
+上下文控制：历史消息、当前清关单、业务上下文
+模型控制：模型选择、thinkingLevel、provider 参数
+工具控制：当前角色可用哪些清关工具
+权限控制：tool_call hook 执行前审批、权限、风控
+结果控制：tool_result hook 执行后脱敏、压缩、错误标准化
+会话控制：消息落库、save point、恢复上下文
+审计控制：请求日志、工具调用日志、provider 调用记录
+UI 控制：message/tool/queue/save_point/settled 事件推送
+长期上下文控制：compaction 与 branch summary</code></pre>
+    </section>
+
+    <section class="card">
+      <h2>本课检查结果</h2>
+      <p>用户已经能够解释 AgentLoop、Agent、AgentHarness 的职责边界；能说明为什么 Session、Compaction、Branch Summary 属于 Harness；能理解 createLoopConfig 是 Harness 向 AgentLoop 注入 Runtime 能力的适配器；并提出后续高概念密度课程应更多使用表格、流程图、设计图来辅助理解。</p>
+    </section>
+
+    <section>
+      <h2>课后复习</h2>
+      <ul>
+        <li><a href="../reference/agent-harness-runtime-control.md">AgentHarness Runtime 控制层参考资料</a></li>
+        <li><a href="../handoffs/0004-agent-harness-runtime-control.md">本课 Handoff</a></li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
