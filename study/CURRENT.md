@@ -8,7 +8,7 @@
 
 ## 当前状态
 
-未开始。
+进行中。
 
 第一课 `0001：Pi Agent Loop 源码精读` 已完成。
 第二课 `0002：AgentMessage vs LLM Message` 已完成。
@@ -38,18 +38,21 @@ convertToLlm = 内部消息到模型协议的边界转换器
 - `ClearanceStatusMessage` 应按需转换后进入 LLM。
 - `PermissionDecisionMessage` 默认不进 LLM，只在安全结论影响下一步行为时转换给模型。
 
-## 下一步
-
-进入第三课：
-
-```text
-study/course-design/0003-tool-call-execution.md
-```
+## 当前问题
 
 第三课要解决的问题：
 
 ```text
 一次 assistant message 中的 toolCall 是如何被校验、拦截、执行、改写，并最终变成 toolResult message 的？
+```
+
+## 当前源码范围
+
+```text
+study/course-design/0003-tool-call-execution.md
+packages/agent/src/agent-loop.ts
+packages/agent/src/types.ts
+packages/coding-agent/src/core/tools/index.ts
 ```
 
 ## 新会话续接方式
@@ -62,4 +65,4 @@ study/course-design/0003-tool-call-execution.md
 4. `study/PROGRESS.md`
 5. `study/handoffs/0002-agent-message-vs-llm-message.md`
 
-然后从第三课开始。
+然后继续第三课。
