@@ -16,7 +16,7 @@
 | 0000 | 学习工作区初始化 | 已完成 | handoffs/0000-initial-study-setup.md | 暂不需要 |
 | 0001 | Pi Agent Loop 源码精读 | 已完成 | handoffs/0001-pi-agent-loop.md | learning-records/0001-agent-loop-is-model-tool-observation-cycle.md |
 | 0002 | AgentMessage vs LLM Message | 已完成 | handoffs/0002-agent-message-vs-llm-message.md | learning-records/0002-agent-message-is-internal-domain-model.md |
-| 0003 | Tool Call 执行链路 | 进行中 | 待生成 | 待验证 |
+| 0003 | Tool Call 执行链路 | 已完成 | handoffs/0003-tool-call-execution.md | learning-records/0003-tool-call-is-controlled-runtime-pipeline.md |
 | 0004 | AgentHarness 是 Runtime 控制层 | 未开始 | 待生成 | 待验证 |
 | 0005 | Session Tree 与 Compaction | 未开始 | 待生成 | 待验证 |
 | 0006 | Extension System | 未开始 | 待生成 | 待验证 |
@@ -32,7 +32,7 @@
 
 ## 下一步
 
-继续第三课：`0003 Tool Call 执行链路`。
+进入第四课：`0004 AgentHarness 是 Runtime 控制层`。
 
 ## 每课结束必须更新
 
