@@ -8,6 +8,26 @@
 模型、工具和消息上下文之间的运行闭环：LLM 生成 assistant message，若包含 tool call 则执行工具，并将 tool result 作为消息回灌给 LLM 继续推理。
 _应避免_：AI 聊天循环、简单对话流程
 
+**Agent**：
+带有状态的 Agent 调用门面，保存当前 messages、tools、streaming 状态，并调用 AgentLoop 执行模型-工具闭环。
+_应避免_：Runtime 控制层、完整应用容器
+
+**AgentHarness**：
+Agent 应用的 Runtime 控制层，负责把 AgentLoop 接入 Session、模型、工具、资源、队列、Hook、Provider 请求治理、Compaction、Branch Summary 和 UI/CLI/SDK 事件系统。
+_应避免_：简单 Agent 包装器、聊天接口
+
+**Runtime 控制层**：
+让 Agent 真正在应用中长期、稳定、可治理运行的控制面，负责状态、配置、权限、事件、请求边界和长期上下文治理。
+_应避免_：单次执行函数
+
+**TurnState**：
+AgentHarness 在每轮运行前组装的富状态快照，包含 messages、resources、streamOptions、sessionId、systemPrompt、model、thinkingLevel、tools、activeTools 等。
+_应避免_：AgentContext
+
+**AgentContext**：
+AgentLoop 执行所需的最小上下文，主要包含 systemPrompt、messages、tools。
+_应避免_：完整 Runtime 状态
+
 **AgentMessage**：
 Pi Agent 内部使用的完整消息账本，承载标准 LLM 消息以及可能的内部自定义消息；它服务 Agent Runtime，不一定直接发送给 LLM。
 _应避免_：LLM 消息、聊天消息
@@ -32,6 +52,10 @@ _应避免_：消息格式转换
 LLM 调用前将 `AgentMessage[]` 转成模型可理解的 `Message[]`，并过滤、脱敏、格式化或转换内部消息。
 _应避免_：上下文压缩、消息追加
 
+**createLoopConfig**：
+AgentHarness 到 AgentLoop 的适配器 / 注入器，把 Harness 的 context、tool_call、tool_result、prepareNextTurn、steering/followUp 队列等 Runtime 能力注入 AgentLoop。
+_应避免_：普通静态配置对象
+
 **beforeToolCall**：
 工具执行前的治理钩子，在参数校验后、真正执行前运行，适合做权限、审批、风控、白名单和危险操作拦截。
 _应避免_：结果脱敏、输出压缩
@@ -55,6 +79,22 @@ _应避免_：toolcallupdate、toolcallend
 **Tool Permission Layer**：
 企业 Agent 中用于控制工具是否可执行的权限与风控层，通常检查用户身份、工具权限、操作类型、资源归属、参数风险、审批状态和审计信息。
 _应避免_：简单 if 判断、单一黑名单
+
+**Provider Hook**：
+Harness 层围绕模型 Provider 请求提供的治理钩子，例如 before_provider_request、before_provider_payload、after_provider_response。
+_应避免_：工具调用 hook
+
+**Session Tree**：
+Pi Harness 的会话历史结构，不只是聊天记录，还包含 message、model_change、thinking_level_change、active_tools_change、compaction、branch_summary 等运行历史节点。
+_应避免_：纯 messages 数组
+
+**Compaction**：
+当上下文过长时，将旧历史压缩成摘要并写入 Session 的长期上下文治理动作。
+_应避免_：普通摘要、删除历史
+
+**Branch Summary**：
+会话树跳转到另一个分支时，对离开或切换的分支内容生成摘要，用于保留跨分支上下文。
+_应避免_：普通聊天总结
 
 **CustomAgentMessages**：
 Pi 允许应用通过 TypeScript declaration merging 扩展的自定义消息集合，使 AgentMessage 能承载应用层消息。
