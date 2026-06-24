@@ -4,20 +4,21 @@
 
 ## 当前课程
 
-`0004`：AgentHarness 是 Runtime 控制层
+`0005`：Session Tree 与 Compaction
 
 ## 当前状态
 
-进行中。
+未开始。
 
 第一课 `0001：Pi Agent Loop 源码精读` 已完成。
 第二课 `0002：AgentMessage vs LLM Message` 已完成。
 第三课 `0003：Tool Call 执行链路` 已完成。
+第四课 `0004：AgentHarness 是 Runtime 控制层` 已完成。
 
 ## 最新 Handoff
 
 ```text
-study/handoffs/0003-tool-call-execution.md
+study/handoffs/0004-agent-harness-runtime-control.md
 ```
 
 ## 已确认理解
@@ -25,35 +26,51 @@ study/handoffs/0003-tool-call-execution.md
 用户已经理解：
 
 ```text
-LLM 只能提出 toolCall；
-Agent Runtime 才真正决定工具能不能执行、如何执行、结果如何治理和回灌。
+AgentLoop 是执行内核；
+Agent 是带状态的调用门面；
+AgentHarness 是把执行内核接入 session、模型、工具、权限、事件、队列、长期上下文和 UI/CLI/SDK 的 Runtime 控制层。
 ```
 
 用户已能解释：
 
-- 为什么 toolCall 不能直接执行 `tool.execute()`。
-- `prepareArguments` 与 `validateToolArguments` 的区别。
-- `beforeToolCall` block 后为什么仍要生成 error toolResult。
-- 并行执行时事件完成顺序和 toolResult message 顺序的区别。
-- `beforeToolCall` 与 `afterToolCall` 的职责边界。
-- 企业级 Tool Permission Layer 的最小检查项。
+- 为什么 AgentLoop 应保持小而纯。
+- 为什么 Session、Compaction、Branch Summary 属于 Harness 层。
+- 为什么 AgentHarness 适合承载企业权限、审计、provider 请求治理和 UI 事件。
+- 为什么 createLoopConfig 是 Harness 到 AgentLoop 的适配器 / 注入器。
+- 企业清关 Agent Harness 应承载哪些能力。
+- 为什么 tool_call hook 比直接改 executeToolCalls 更低耦合。
 
-## 当前问题
+## 教学偏好提醒
 
-第四课要解决的问题：
+用户明确提出：对于类似 AgentHarness、Session、Compaction 这类内容多、新概念多、环节多的课程，后续应默认使用结构化内容输出，包括：
 
 ```text
-AgentHarness 为什么不是简单封装 Agent，而是把模型、工具、消息、权限、事件、上下文和 UI/CLI/SDK 连接起来的 Runtime 控制层？
+分层表格
+流程图
+职责边界图
+设计图
+小结卡片
+必要时生成更美观的图片辅助理解
 ```
 
-## 当前源码范围
+该偏好已记录到：
 
 ```text
-study/course-design/0004-agent-harness-runtime-control.md
-packages/agent/src/harness/*
-packages/agent/src/agent.ts
-packages/agent/src/types.ts
-packages/coding-agent/src/core/*
+study/NOTES.md
+```
+
+## 下一步
+
+进入第五课：
+
+```text
+study/course-design/0005-session-tree-and-compaction.md
+```
+
+第五课要解决的问题：
+
+```text
+Pi 的 Session 为什么不是简单聊天记录，而是一个包含 message、model_change、active_tools_change、compaction、branch_summary 等节点的运行历史树？Compaction 如何在长上下文中保持模型可继续推理？
 ```
 
 ## 新会话续接方式
@@ -64,6 +81,6 @@ packages/coding-agent/src/core/*
 2. `study/MISSION.md`
 3. `study/CURRENT.md`
 4. `study/PROGRESS.md`
-5. `study/handoffs/0003-tool-call-execution.md`
+5. `study/handoffs/0004-agent-harness-runtime-control.md`
 
-然后继续第四课。
+然后从第五课开始。
