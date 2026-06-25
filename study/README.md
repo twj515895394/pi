@@ -76,6 +76,12 @@ study/blogs/published/                # 后续发布版目录，可按需创建
 文章要包含结论、结构化图表、工程类比和阶段性理解。
 ```
 
+当前已完成 0001-0005 共 5 篇课程博文草稿，最新草稿为：
+
+```text
+study/blogs/drafts/0005-session-tree-and-compaction.md
+```
+
 ## 新会话应该怎么继续
 
 请按顺序阅读：
