@@ -18,7 +18,7 @@
 | 0002 | AgentMessage vs LLM Message | 已完成 | handoffs/0002-agent-message-vs-llm-message.md | learning-records/0002-agent-message-is-internal-domain-model.md |
 | 0003 | Tool Call 执行链路 | 已完成 | handoffs/0003-tool-call-execution.md | learning-records/0003-tool-call-is-controlled-runtime-pipeline.md |
 | 0004 | AgentHarness 是 Runtime 控制层 | 已完成 | handoffs/0004-agent-harness-runtime-control.md | learning-records/0004-agent-harness-is-runtime-control-plane.md |
-| 0005 | Session Tree 与 Compaction | 进行中 | handoffs/0005-session-tree-and-compaction.md | 待理解检查 |
+| 0005 | Session Tree 与 Compaction | 已完成 | handoffs/0005-session-tree-and-compaction.md | learning-records/0005-session-tree-is-runtime-history-tree.md |
 | 0006 | Extension System | 未开始 | 待生成 | 待验证 |
 | 0007 | 企业级 Agent Harness 设计 | 未开始 | 待生成 | 待验证 |
 | 0008 | Coding Tools | 未开始 | 待生成 | 待验证 |
@@ -32,7 +32,7 @@
 
 ## 下一步
 
-完成第五课 `0005 Session Tree 与 Compaction` 的理解检查。通过后再写入 learning-record，并按博客写作规范沉淀 `0005` 博文草稿。
+进入第六课 `0006 Extension System`。新会话开始前应读取 `study/CURRENT.md`、`study/PROGRESS.md`、最新 handoff，以及 `study/TEACHING-PROTOCOL.md`。
 
 ## 每课结束必须更新
 
