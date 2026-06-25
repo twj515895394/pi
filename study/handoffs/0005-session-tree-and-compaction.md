@@ -2,38 +2,58 @@
 
 ## 本节课状态
 
-- 状态：进行中，已完成源码阅读与课程讲解，待用户完成理解检查
+- 状态：进行中，已根据用户反馈重新组织课程讲法，待用户完成理解检查
 - 日期：2026-06-25
 - 对应课程：`study/course-design/0005-session-tree-and-compaction.md`
 - 对应课件：`study/lessons/0005-session-tree-and-compaction.html`
 - 对应参考资料：`study/reference/session-tree-and-compaction.md`
 
+## 用户反馈与修正
+
+用户指出第一版第五课“不够好”，没有充分遵守学习偏好。
+
+已按 `study/NOTES.md` 中的偏好重新组织：
+
+```text
+中文为主
+源码 + 调用链 + 工程场景
+结构化输出：分层表格、流程图、职责边界图、设计图、小结卡片
+高概念密度内容先总览，再分模块拆解，最后用企业场景回填
+企业案例统一使用泛化金融行业 Agent
+```
+
+## 重组后的课程主线
+
+新版本不再按“源码点罗列”讲，而按以下教学路径讲：
+
+```text
+0. 先建立心智模型：Session 不是聊天记录表，而是 Runtime History Tree
+1. 三条运行链路总览：普通下一轮 / 长上下文 / 分支切换
+2. 职责边界图：UI/CLI -> AgentHarness -> Session -> Storage -> JSONL
+3. 数据模型：SessionTreeEntry 类型联合
+4. 普通链路：buildSessionContext 如何把树变成 LLM Context
+5. 为什么不是 messages[]：五个工程原因
+6. Compaction：上下文视图重写，而不是删除历史
+7. firstKeptEntryId：summary 与 recent messages 的边界
+8. Cut Point / Split Turn：为什么不能切 toolResult
+9. Branch Summary：分支切换时的移交说明
+10. Compaction vs Branch Summary 对照
+11. 金融行业 Agent 回填：信贷审批 Agent 的审计树、检查点摘要、分支移交说明
+12. Java / Dify 经验迁移
+13. 小结卡片
+14. 理解检查
+```
+
 ## 本节课目标
 
 理解 Pi 的 Session 为什么不是简单聊天记录，而是包含 message、model_change、thinking_level_change、active_tools_change、compaction、branch_summary、custom、custom_message、label、session_info、leaf 等节点的运行历史树；理解 Compaction 和 Branch Summary 如何服务长上下文与分支会话。
 
-## 实际学习内容
-
-本节课已讲解以下内容：
-
-1. Session Tree 总览：`id` / `parentId` 形成树，`leaf` 表示当前 active branch。
-2. `SessionTreeEntry` 类型联合：message、runtime 状态变化、compaction、branch_summary、extension 状态、label、leaf。
-3. JSONL 存储模型：append-only session 文件；entry 追加时更新 current leaf；`setLeafId()` 通过 leaf entry 持久化当前指针。
-4. `buildSessionContext()`：从当前 branch 还原 LLM messages、thinkingLevel、model、activeToolNames。
-5. Compaction：通过 `prepareCompaction()` 找切点、保留 recent messages、生成 summary、写入 `CompactionEntry`。
-6. Cut point 规则：不能切在 toolResult 上；必要时支持 split turn。
-7. Repeated compaction：通过 previousSummary 和 firstKeptEntryId 迭代更新历史摘要。
-8. Branch Summary：`navigateTree()` 切换 branch 时，摘要 old leaf 到 common ancestor 的 abandoned branch。
-9. Harness 扩展点：`session_before_compact`、`session_compact`、`session_before_tree`、`session_tree`。
-10. 金融行业 Agent 类比：信贷审批 Agent 中的审批过程审计树、检查点摘要、分支移交说明。
-
 ## 本课核心结论
 
 ```text
-Session Tree = Agent Runtime 的可导航运行历史树
-Compaction = 长上下文检查点摘要
-Branch Summary = 分支切换移交说明
-Leaf = 当前 active branch 指针
+Session Tree 保存“发生过什么、现在在哪条路径、下一轮该带什么上下文”；
+Compaction 负责把旧路径折叠成检查点；
+Branch Summary 负责把离开的分支变成移交说明。
 ```
 
 ## 源码阅读进度
@@ -48,6 +68,7 @@ study/CURRENT.md
 study/PROGRESS.md
 study/handoffs/0004-agent-harness-runtime-control.md
 study/course-design/0005-session-tree-and-compaction.md
+study/NOTES.md
 packages/agent/src/harness/types.ts
 packages/agent/src/harness/session/session.ts
 packages/agent/src/harness/session/jsonl-storage.ts
@@ -94,6 +115,18 @@ session_before_tree
 session_tree
 ```
 
+## 重组后的关键理解点
+
+1. `messages[]` 只能保存对话；Session Tree 保存 Runtime History。
+2. `id` / `parentId` 负责历史结构，`leaf` 负责当前 active branch。
+3. `buildSessionContext()` 是从完整历史树到 LLM 当前上下文视图的转换器。
+4. Compaction 不删除 JSONL 旧 entry，而是用 summary + `firstKeptEntryId` 改写 LLM 看到的上下文视图。
+5. `firstKeptEntryId` 是近期原文保留区的起点，不能只保存 summary。
+6. `toolResult` 不能作为 cut point，因为它必须和 assistant toolCall 成对理解。
+7. Split turn 用于单轮任务本身过长的场景：摘要 turn prefix，保留 turn suffix。
+8. Branch Summary 是分支切换时的移交说明，不是长上下文压缩。
+9. Compaction / Branch Summary 都属于 AgentHarness 层，不属于 AgentLoop 层。
+
 ## 待理解检查
 
 用户需要用自己的话回答：
@@ -104,18 +137,12 @@ session_tree
 
 ## 文档更新情况
 
-已新增：
-
-```text
-study/lessons/0005-session-tree-and-compaction.html
-study/handoffs/0005-session-tree-and-compaction.md
-```
-
-已更新：
+已重写 / 更新：
 
 ```text
 study/reference/session-tree-and-compaction.md
-study/PROGRESS.md
+study/lessons/0005-session-tree-and-compaction.html
+study/handoffs/0005-session-tree-and-compaction.md
 study/CURRENT.md
 ```
 
@@ -142,5 +169,5 @@ study/blogs/drafts/0005-session-tree-and-compaction.md
 如果新开会话，请说：
 
 ```text
-继续 Pi Agent Harness 学习。请读取 study/CURRENT.md、study/PROGRESS.md 和最新 handoff study/handoffs/0005-session-tree-and-compaction.md。0005 已讲解但待理解检查，请先让我回答三个检查问题；通过后再写 learning-record 和 0005 博文草稿，然后进入 0006 Extension System。
+继续 Pi Agent Harness 学习。请读取 study/CURRENT.md、study/PROGRESS.md 和最新 handoff study/handoffs/0005-session-tree-and-compaction.md。0005 已根据用户反馈重组讲法但仍待理解检查，请先让我回答三个检查问题；通过后再写 learning-record 和 0005 博文草稿，然后进入 0006 Extension System。
 ```
