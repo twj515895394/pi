@@ -8,11 +8,21 @@
 - 对应课件：`study/lessons/0005-session-tree-and-compaction.html`
 - 对应参考资料：`study/reference/session-tree-and-compaction.md`
 
+## 新会话必须读取的教学协议
+
+新会话继续本课前，必须读取：
+
+```text
+study/TEACHING-PROTOCOL.md
+```
+
+原因：用户反馈过短提示词会导致新会话讲课风格丢失。后续不能只读取 `CURRENT.md` 和本 handoff 后简单输出摘要，必须按教学协议恢复固定讲课节奏：总览图、分层表格、流程图、源码锚点、金融行业 Agent 类比、理解检查和课程收尾。
+
 ## 用户反馈与修正
 
 用户指出第一版第五课“不够好”，没有充分遵守学习偏好。
 
-已按 `study/NOTES.md` 中的偏好重新组织：
+已按 `study/NOTES.md` 和 `study/TEACHING-PROTOCOL.md` 中的偏好重新组织：
 
 ```text
 中文为主
@@ -63,6 +73,7 @@ Branch Summary 负责把离开的分支变成移交说明。
 ```text
 study/README.md
 study/MASTER-PLAN.md
+study/TEACHING-PROTOCOL.md
 study/MISSION.md
 study/CURRENT.md
 study/PROGRESS.md
@@ -144,6 +155,9 @@ study/reference/session-tree-and-compaction.md
 study/lessons/0005-session-tree-and-compaction.html
 study/handoffs/0005-session-tree-and-compaction.md
 study/CURRENT.md
+study/TEACHING-PROTOCOL.md
+study/HANDOFF-PROTOCOL.md
+study/LEARNING-WORKFLOW.md
 ```
 
 暂未写入：
@@ -169,5 +183,7 @@ study/blogs/drafts/0005-session-tree-and-compaction.md
 如果新开会话，请说：
 
 ```text
-继续 Pi Agent Harness 学习。请读取 study/CURRENT.md、study/PROGRESS.md 和最新 handoff study/handoffs/0005-session-tree-and-compaction.md。0005 已根据用户反馈重组讲法但仍待理解检查，请先让我回答三个检查问题；通过后再写 learning-record 和 0005 博文草稿，然后进入 0006 Extension System。
+继续 Pi Agent Harness 学习。请读取 study/README.md、study/MASTER-PLAN.md、study/TEACHING-PROTOCOL.md、study/CURRENT.md、study/PROGRESS.md 和最新 handoff study/handoffs/0005-session-tree-and-compaction.md。0005 已根据用户反馈重组讲法但仍待理解检查，请先让我回答三个检查问题；通过后再写 learning-record 和 0005 博文草稿，然后进入 0006 Extension System。
 ```
+
+即使用户使用更短提示词，新会话也必须主动读取 `study/TEACHING-PROTOCOL.md` 并按其中节奏继续。
