@@ -32,6 +32,7 @@ study/blogs/WRITING-GUIDELINES.md
 | 0002 | AgentMessage vs LLM Message：为什么内部消息和模型消息要分开？ | 0002 AgentMessage vs LLM Message | 草稿完成 |
 | 0003 | Tool Call 不是函数调用：模型提出工具调用后，Runtime 做了什么？ | 0003 Tool Call 执行链路 | 草稿完成 |
 | 0004 | AgentHarness 为什么不是 Agent 的简单封装？ | 0004 AgentHarness 是 Runtime 控制层 | 草稿完成 |
+| 0005 | 为什么 Agent 的 Session 不是聊天记录：Session Tree、Compaction 与 Branch Summary | 0005 Session Tree 与 Compaction | 草稿完成 |
 
 ## 文件位置
 
@@ -40,6 +41,7 @@ study/blogs/drafts/0001-agent-loop.md
 study/blogs/drafts/0002-agent-message-vs-llm-message.md
 study/blogs/drafts/0003-tool-call-lifecycle.md
 study/blogs/drafts/0004-agent-harness-runtime-control.md
+study/blogs/drafts/0005-session-tree-and-compaction.md
 ```
 
 ## 后续规则
