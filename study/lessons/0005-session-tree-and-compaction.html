@@ -9,137 +9,217 @@
 <body>
   <main>
     <h1>0005：Session Tree 与 Compaction</h1>
-    <p class="note">状态：已讲解，待理解检查。对应参考资料：<a href="../reference/session-tree-and-compaction.md">session-tree-and-compaction.md</a></p>
+    <p class="note">状态：已按学习偏好重组讲解，待理解检查。对应参考资料：<a href="../reference/session-tree-and-compaction.md">session-tree-and-compaction.md</a></p>
 
     <section class="card">
-      <h2>本课目标</h2>
-      <p>理解 Pi 的 Session 为什么不是简单聊天记录，而是包含 message、model_change、active_tools_change、compaction、branch_summary 等节点的运行历史树；理解 Compaction 和 Branch Summary 如何服务长上下文与分支会话。</p>
+      <h2>本课先建立一个心智模型</h2>
+      <p>不要先把 Session 理解成“聊天记录表”。在 Pi 里，它更像一个 Agent Runtime 的运行账本 + 历史版本树 + 上下文生成器。</p>
+      <pre><code>普通聊天系统：
+messages[]
+  只回答：用户和助手说过什么？
+
+Pi Session Tree：
+entries(id, parentId, type, payload)
+  回答：
+  1. 这条 Agent 运行路径上发生过什么？
+  2. 当前 active leaf 在哪里？
+  3. 当前路径应该恢复哪个 model / thinkingLevel / activeTools？
+  4. 给下一轮 LLM 的上下文应该是哪些消息？
+  5. 历史太长时，哪些内容被 summary 代替，哪些 recent messages 必须原样保留？
+  6. 从一个 branch 跳到另一个 branch 时，离开的 branch 有哪些结论要带走？</code></pre>
     </section>
 
     <section>
       <h2>一句话结论</h2>
-      <p><strong>Session Tree 保存 Agent 的可导航运行历史；Compaction 把旧历史折叠成摘要检查点；Branch Summary 把离开的分支压成移交说明。</strong></p>
+      <p><strong>Session Tree 保存“发生过什么、现在在哪条路径、下一轮该带什么上下文”；Compaction 负责把旧路径折叠成检查点；Branch Summary 负责把离开的分支变成移交说明。</strong></p>
     </section>
 
     <section>
-      <h2>总览图</h2>
-      <pre><code>User / CLI / UI
-    |
-    v
-AgentHarness
-    |
-    | get current leaf
-    v
-Session Tree (JSONL append-only)
-    |
-    | getBranch(leafId)
-    v
-buildSessionContext(pathEntries)
-    |
-    v
-AgentLoop / LLM Context
-
-Long context:
-Session path -> prepareCompaction -> CompactionEntry -> summary + kept recent messages
-
-Branch navigation:
-old leaf -> collect abandoned branch -> BranchSummaryEntry -> new leaf context</code></pre>
+      <h2>三条运行链路总览</h2>
+      <pre><code>AgentHarness
+  ├─ 普通下一轮：
+  │   session.getBranch(leaf) -> buildSessionContext() -> AgentLoop
+  │
+  ├─ 长上下文：
+  │   prepareCompaction() -> compact() -> appendCompaction()
+  │
+  └─ 分支切换：
+      collectEntriesForBranchSummary() -> generateBranchSummary()
+        -> session.moveTo(newLeaf, summary?)</code></pre>
+      <p>边界：AgentLoop 只关心当前 run 的模型-工具闭环；AgentHarness 负责长期运行历史的保存、恢复、压缩、切换和审计。</p>
     </section>
 
     <section>
-      <h2>Session Tree 数据模型</h2>
+      <h2>职责边界图</h2>
+      <pre><code>UI / CLI / SDK
+  -> AgentHarness
+      -> Session
+          -> SessionStorage / JsonlSessionStorage
+              -> JSONL file
+
+AgentHarness：phase、hook、事件、compact、navigateTree
+Session：append、moveTo、getBranch、buildContext
+Storage：append-only、byId、currentLeafId、getPathToRoot</code></pre>
+    </section>
+
+    <section>
+      <h2>Session Entry 数据模型</h2>
       <table>
-        <thead><tr><th>Entry</th><th>是否进入 LLM Context</th><th>职责</th></tr></thead>
+        <thead><tr><th>Entry</th><th>是否进入 LLM Context</th><th>Runtime 价值</th></tr></thead>
         <tbody>
-          <tr><td>message</td><td>是</td><td>用户、助手、工具结果、bash 等消息</td></tr>
-          <tr><td>custom_message</td><td>是</td><td>Extension 注入给模型看的上下文</td></tr>
-          <tr><td>branch_summary</td><td>是</td><td>切换分支时保留被离开分支的摘要</td></tr>
-          <tr><td>compaction</td><td>间接是</td><td>生成 compactionSummary，替代旧历史进入上下文</td></tr>
+          <tr><td>message</td><td>是</td><td>用户输入、assistant 输出、tool result、bash 结果等</td></tr>
+          <tr><td>custom_message</td><td>是</td><td>Extension 注入给模型的上下文</td></tr>
+          <tr><td>branch_summary</td><td>是</td><td>把离开的分支摘要成可继续参考的上下文</td></tr>
+          <tr><td>compaction</td><td>间接是</td><td>转成 compactionSummary，替代旧历史</td></tr>
           <tr><td>model_change</td><td>否</td><td>恢复当前 branch 的模型选择</td></tr>
           <tr><td>thinking_level_change</td><td>否</td><td>恢复当前 branch 的推理强度</td></tr>
           <tr><td>active_tools_change</td><td>否</td><td>恢复当前 branch 的可用工具集合</td></tr>
-          <tr><td>custom</td><td>否</td><td>Extension 私有状态</td></tr>
+          <tr><td>custom</td><td>否</td><td>Extension 自己的持久化状态，不暴露给模型</td></tr>
           <tr><td>label / session_info / leaf</td><td>否</td><td>书签、展示名、当前指针</td></tr>
         </tbody>
       </table>
     </section>
 
     <section>
-      <h2>buildSessionContext 流程</h2>
-      <pre><code>pathEntries = session.getBranch(currentLeaf)
+      <h2>普通链路：Session Tree 如何变成 LLM Context</h2>
+      <pre><code>buildSessionContext(pathEntries)
 
-for entry in pathEntries:
-  update thinkingLevel / model / activeTools
-  remember latest compaction
+第一遍扫描：
+  thinking_level_change -> 更新 thinkingLevel
+  model_change -> 更新 model
+  assistant message -> 可恢复 provider/model
+  active_tools_change -> 更新 activeToolNames
+  compaction -> 记录最后一个 compaction
 
-if compaction exists:
-  messages = [compactionSummary]
-           + messages from firstKeptEntryId to compaction
-           + messages after compaction
-else:
-  messages = all message/custom_message/branch_summary on path</code></pre>
-      <p>重点：Compaction 不删除旧 JSONL entry，只改变“下次给 LLM 的上下文视图”。</p>
+第二步生成 messages：
+  没有 compaction：
+    message + custom_message + branch_summary
+
+  有 compaction：
+    compactionSummary
+    + firstKeptEntryId 开始的保留消息
+    + compaction 之后的新消息</code></pre>
+      <p>核心：Session Tree 是完整历史；buildSessionContext 是“给模型看的当前视图”。</p>
     </section>
 
     <section>
-      <h2>Compaction 流程</h2>
-      <pre><code>AgentHarness.compact()
-  -> session.getBranch()
-  -> prepareCompaction()
-       -> estimateContextTokens()
-       -> findCutPoint(keepRecentTokens)
-       -> collect messagesToSummarize
-       -> collect turnPrefixMessages if split turn
-       -> extract fileOps
-  -> session_before_compact hook
-  -> compact()
-       -> generateSummary()
-       -> optional generateTurnPrefixSummary()
-  -> session.appendCompaction()
-  -> emit session_compact</code></pre>
-    </section>
-
-    <section>
-      <h2>切点规则</h2>
+      <h2>为什么不是 messages[]</h2>
       <table>
-        <thead><tr><th>规则</th><th>原因</th></tr></thead>
+        <thead><tr><th>工程需求</th><th>messages[] 的问题</th><th>Session Tree 的解法</th></tr></thead>
         <tbody>
-          <tr><td>保留最近 keepRecentTokens</td><td>最近工作最好原样保留</td></tr>
-          <tr><td>预留 reserveTokens</td><td>给摘要 prompt 和模型输出留空间</td></tr>
-          <tr><td>不切 toolResult</td><td>tool result 必须和 tool call 保持语义配对</td></tr>
-          <tr><td>允许 split turn</td><td>单轮过大时摘要 turn prefix，保留后缀继续执行</td></tr>
-          <tr><td>重复压缩携带 previousSummary</td><td>防止多次压缩丢掉更早历史</td></tr>
+          <tr><td>分支探索</td><td>回到旧点会截断或复制数组</td><td>id / parentId 从任意 entry 开新分支</td></tr>
+          <tr><td>当前指针</td><td>不知道当前 active branch</td><td>leaf 持久化当前指针</td></tr>
+          <tr><td>Runtime 恢复</td><td>只能恢复文本</td><td>模型、工具、推理等级变化也是 entry</td></tr>
+          <tr><td>长上下文</td><td>只能粗暴截断旧消息</td><td>compaction = summary + firstKeptEntryId</td></tr>
+          <tr><td>分支切换</td><td>离开的路径结论丢失</td><td>branch_summary 把 abandoned branch 移交给新路径</td></tr>
         </tbody>
       </table>
     </section>
 
     <section>
-      <h2>Branch Summary 流程</h2>
-      <pre><code>AgentHarness.navigateTree(targetId, summarize=true)
-  -> oldLeafId = session.getLeafId()
-  -> collectEntriesForBranchSummary(oldLeafId, targetId)
-       -> find common ancestor
-       -> collect old leaf back to ancestor
-  -> session_before_tree hook
-  -> optional generateBranchSummary()
-  -> session.moveTo(newLeafId, summary?)
-  -> emit session_tree</code></pre>
+      <h2>Compaction：上下文视图重写</h2>
+      <pre><code>AgentHarness.compact()
+  -> session.getBranch()
+  -> prepareCompaction(pathEntries, settings)
+       -> estimateContextTokens(buildSessionContext(...).messages)
+       -> findCutPoint(keepRecentTokens)
+       -> messagesToSummarize = 旧历史
+       -> turnPrefixMessages = split turn 前缀
+       -> fileOps = 读写文件轨迹
+  -> session_before_compact hook
+  -> compact(preparation, models, model)
+       -> generateSummary()
+       -> optional generateTurnPrefixSummary()
+  -> session.appendCompaction(summary, firstKeptEntryId, tokensBefore, details)
+  -> session_compact event</code></pre>
+      <p>Compaction 的目标不是让 JSONL 文件变小，而是让下一轮 LLM 看到：summary + 近期原文 + 新消息。</p>
     </section>
 
     <section>
-      <h2>金融行业 Agent 类比</h2>
-      <pre><code>信贷审批 Agent
-  客户申请材料
-    -> 征信分析
-    -> 规则工具
-    -> 额度测算工具
-    -> 分支 A：拒绝授信方案
-    -> 分支 B：补充材料后重评
+      <h2>firstKeptEntryId 的作用</h2>
+      <table>
+        <thead><tr><th>只保存 summary 的问题</th><th>firstKeptEntryId 解决什么</th></tr></thead>
+        <tbody>
+          <tr><td>模型失去近期原始证据</td><td>明确近期原文从哪个 entry 开始保留</td></tr>
+          <tr><td>无法重建 summary + recent messages 的上下文</td><td>buildSessionContext 能从该 entry 拼接保留区</td></tr>
+          <tr><td>重复压缩时容易丢早期历史</td><td>previousSummary + kept boundary 可以迭代更新摘要</td></tr>
+        </tbody>
+      </table>
+    </section>
 
-Session Tree = 审批过程审计树
-Compaction = 长审批链路检查点摘要
-Branch Summary = 方案切换时的分支移交说明
-Leaf = 当前正在推进的审批路径</code></pre>
+    <section>
+      <h2>Cut Point 与 Split Turn</h2>
+      <pre><code>不能切 toolResult：
+assistant toolCall(id="risk_check_001")
+  -> toolResult(toolCallId="risk_check_001")
+
+如果切在 toolResult，模型会看到孤立工具结果，丢失调用原因和参数。</code></pre>
+      <p>如果一整个 turn 太长，Pi 会摘要 turn prefix，保留 turn suffix，目标是保留最近执行现场，同时不忘这轮最初目标和早期决策。</p>
+    </section>
+
+    <section>
+      <h2>Branch Summary：分支移交说明</h2>
+      <pre><code>Before:
+        B -> C -> D   old leaf: 拒绝授信方案
+      /
+A ---
+      
+        E -> F       target: 补充材料方案
+
+commonAncestor = A
+entriesToSummarize = B,C,D
+
+After:
+        B -> C -> D   abandoned branch
+      /
+A ---
+      
+        E -> F -> branch_summary(B,C,D)   new context</code></pre>
+    </section>
+
+    <section>
+      <h2>Compaction vs Branch Summary</h2>
+      <table>
+        <thead><tr><th>维度</th><th>Compaction</th><th>Branch Summary</th></tr></thead>
+        <tbody>
+          <tr><td>解决问题</td><td>上下文窗口不够</td><td>切换分支时丢失离开路径的探索结论</td></tr>
+          <tr><td>摘要对象</td><td>当前 branch 的旧历史</td><td>old leaf 到 common ancestor 的 abandoned branch</td></tr>
+          <tr><td>写入节点</td><td>compaction</td><td>branch_summary</td></tr>
+          <tr><td>进入上下文方式</td><td>compactionSummary + recent messages</td><td>branchSummary message 接入新路径</td></tr>
+          <tr><td>关键词</td><td>检查点</td><td>移交说明</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>金融行业 Agent 回填</h2>
+      <pre><code>信贷审批 Agent
+A: 评估一笔信贷申请
+  -> B: 读取申请材料
+  -> C: 调用征信摘要工具
+  -> D: 调用风险规则工具
+  -> E: 分支 1：拒绝授信方案
+  -> F: 分支 2：补充材料后重评方案</code></pre>
+      <table>
+        <thead><tr><th>Pi 概念</th><th>金融 Agent 类比</th></tr></thead>
+        <tbody>
+          <tr><td>Session Tree</td><td>审批过程审计树</td></tr>
+          <tr><td>Leaf</td><td>当前正在推进的审批路径</td></tr>
+          <tr><td>Compaction</td><td>长审批链路检查点摘要</td></tr>
+          <tr><td>Branch Summary</td><td>方案切换时的分支移交说明</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>小结卡片</h2>
+      <pre><code>1. Session Tree 不是 messages[]，而是 Runtime History Tree。
+2. id / parentId 负责历史结构，leaf 负责当前位置。
+3. buildSessionContext 把完整历史树转换成当前给 LLM 看的上下文视图。
+4. Compaction 不删历史，只把旧历史换成 summary，并从 firstKeptEntryId 保留近期原文。
+5. toolResult 不能作为切点，因为它必须和 toolCall 成对理解。
+6. Branch Summary 是分支切换时的上下文移交，不是长上下文压缩。
+7. 这些能力都属于 Harness 层，不属于 AgentLoop 层。</code></pre>
     </section>
 
     <section class="card">
