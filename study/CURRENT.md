@@ -24,6 +24,16 @@ study/MASTER-PLAN.md
 
 `MASTER-PLAN.md` 是唯一权威学习主计划。后续课程、补课、小课和阶段练习都应服务该主计划。
 
+## 教学执行协议
+
+```text
+study/TEACHING-PROTOCOL.md
+```
+
+新会话必须读取该文件，用于恢复固定讲课节奏、结构化讲解方式、理解检查方式和收尾规则。
+
+如果用户只说“继续下一节课”，也不能简单输出摘要；应主动读取学习工作区文件，并按教学协议执行。
+
 ## 最新 Handoff
 
 ```text
@@ -109,6 +119,7 @@ study/handoffs/0005-session-tree-and-compaction.md
 
 ```text
 study/NOTES.md
+study/TEACHING-PROTOCOL.md
 ```
 
 ## 新会话续接方式
@@ -117,9 +128,10 @@ study/NOTES.md
 
 1. `study/README.md`
 2. `study/MASTER-PLAN.md`
-3. `study/MISSION.md`
-4. `study/CURRENT.md`
-5. `study/PROGRESS.md`
-6. `study/handoffs/0005-session-tree-and-compaction.md`
+3. `study/TEACHING-PROTOCOL.md`
+4. `study/MISSION.md`
+5. `study/CURRENT.md`
+6. `study/PROGRESS.md`
+7. `study/handoffs/0005-session-tree-and-compaction.md`
 
 然后先完成第五课理解检查。理解检查通过后，再写 learning-record 和博客草稿。
