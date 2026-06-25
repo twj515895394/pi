@@ -2,7 +2,7 @@
 
 ## 本节课状态
 
-- 状态：进行中，已根据用户反馈重新组织课程讲法，待用户完成理解检查
+- 状态：进行中，已根据用户反馈重新组织课程讲法；第一次理解检查为部分通过，需补讲 branch vs session 边界
 - 日期：2026-06-25
 - 对应课程：`study/course-design/0005-session-tree-and-compaction.md`
 - 对应课件：`study/lessons/0005-session-tree-and-compaction.html`
@@ -138,13 +138,27 @@ session_tree
 8. Branch Summary 是分支切换时的移交说明，不是长上下文压缩。
 9. Compaction / Branch Summary 都属于 AgentHarness 层，不属于 AgentLoop 层。
 
-## 待理解检查
+## 第一次理解检查反馈
 
-用户需要用自己的话回答：
+用户回答情况：
 
-1. 为什么 Pi 的 Session 不能只设计成 `messages[]`？至少说出两个工程原因。
-2. Compaction 为什么要保存 `firstKeptEntryId`，而不是只保存一个 summary？
-3. 在金融行业 Agent 里，如果从“拒绝授信方案”切到“补充材料方案”，Branch Summary 应该保留哪些信息？
+1. 关于为什么不是 `messages[]`：方向正确，已经抓到回到旧点、长上下文不友好、分支切换不友好。但需要纠正：在同一个 session tree 内开分支依赖的是 entry `id` / `parentId` / `leaf`，不是单纯通过 `sessionId`。`sessionId` 更偏向会话文件身份；`JsonlSessionRepo.fork()` 才会创建新的 session 文件。
+2. 关于 `firstKeptEntryId`：基本正确。需要精确化：它不是“从哪里开始压缩”的游标，而是“压缩之后仍然保留原文的起点”。它告诉 `buildSessionContext()`：summary 代表旧历史，`firstKeptEntryId` 开始的 recent messages 继续原样进入上下文。
+3. 关于 Branch Summary：用户不清楚“切换方案”指的是切换分支还是切换会话。这说明需要补讲 branch vs session vs fork 的职责边界。
+
+结论：本次不应写 learning-record。下一步应先补讲：
+
+```text
+sessionId / session file / branch / leaf / fork / navigateTree / branch_summary 的区别
+```
+
+## 补讲后的待理解检查
+
+请用户重新用自己的话回答：
+
+1. 同一个 session tree 里，“回到旧点继续做”和“开新 session/fork”有什么区别？
+2. `firstKeptEntryId` 在 `buildSessionContext()` 时到底起什么作用？
+3. Branch Summary 发生在切换 branch 还是切换 session？它要把哪条路径上的内容带到哪里？
 
 ## 文档更新情况
 
@@ -183,7 +197,5 @@ study/blogs/drafts/0005-session-tree-and-compaction.md
 如果新开会话，请说：
 
 ```text
-继续 Pi Agent Harness 学习。请读取 study/README.md、study/MASTER-PLAN.md、study/TEACHING-PROTOCOL.md、study/CURRENT.md、study/PROGRESS.md 和最新 handoff study/handoffs/0005-session-tree-and-compaction.md。0005 已根据用户反馈重组讲法但仍待理解检查，请先让我回答三个检查问题；通过后再写 learning-record 和 0005 博文草稿，然后进入 0006 Extension System。
+继续 Pi Agent Harness 学习。请读取 study/CURRENT.md、study/PROGRESS.md 和最新 handoff study/handoffs/0005-session-tree-and-compaction.md。0005 已根据用户反馈重组讲法，第一次理解检查为部分通过，请先补讲 sessionId / branch / leaf / fork / navigateTree / branch_summary 的区别；通过后再写 learning-record 和 0005 博文草稿，然后进入 0006 Extension System。
 ```
-
-即使用户使用更短提示词，新会话也必须主动读取 `study/TEACHING-PROTOCOL.md` 并按其中节奏继续。
