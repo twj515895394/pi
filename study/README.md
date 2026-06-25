@@ -21,12 +21,39 @@ Agent Loop
   -> 企业级 Agent Harness 设计
 ```
 
+## 学习主计划
+
+`study/MASTER-PLAN.md` 是唯一权威学习主计划。
+
+它定义：
+
+```text
+学习总目标
+阶段路线
+课程清单
+阶段验收物
+动态补课规则
+高概念密度课程教学规则
+当前执行方式
+```
+
+其他规划文件都应服务于 `MASTER-PLAN.md`：
+
+```text
+COURSE-ROADMAP.md      阶段路线图
+COURSE-LIST.md         课程清单
+SOURCE-READING-MAP.md  源码阅读地图
+PROGRESS.md            当前进度看板
+CURRENT.md             新会话续接入口
+```
+
 ## 新会话应该怎么继续
 
 请按顺序阅读：
 
 ```text
 study/README.md
+study/MASTER-PLAN.md
 study/MISSION.md
 study/CURRENT.md
 study/PROGRESS.md
@@ -35,6 +62,7 @@ study/PROGRESS.md
 
 其中：
 
+- `MASTER-PLAN.md`：唯一权威学习主计划。
 - `CURRENT.md`：当前学习状态入口。
 - `PROGRESS.md`：全局课程进度表。
 - `handoffs/`：每节课结束后的交接文档。
@@ -44,12 +72,13 @@ study/PROGRESS.md
 ```text
 study/
 ├── README.md                    # 工作区主入口
+├── MASTER-PLAN.md               # 唯一权威学习主计划
 ├── MISSION.md                   # 学习使命
 ├── CURRENT.md                   # 当前学习状态，新会话优先读
 ├── PROGRESS.md                  # 全局学习进度总表
 ├── HANDOFF-PROTOCOL.md          # 每课 handoff 规则
 ├── LEARNING-WORKFLOW.md         # 学习节奏
-├── COURSE-ROADMAP.md            # 路线图
+├── COURSE-ROADMAP.md            # 阶段路线图
 ├── COURSE-LIST.md               # 课程清单
 ├── SOURCE-READING-MAP.md        # 源码阅读地图
 ├── EXERCISES.md                 # 阶段练习
@@ -98,10 +127,4 @@ study/learning-records/<next-id>-<slug>.md
 
 ## 当前下一步
 
-当前下一步是开始第一课：
-
-```text
-study/course-design/0001-pi-agent-loop.md
-```
-
-第一课目标：读懂一次 `prompt()` 如何进入 Agent Loop，并最终变成模型响应、工具调用、工具结果回灌和下一轮模型调用。
+当前下一步以 `study/CURRENT.md` 为准。课程主线以 `study/MASTER-PLAN.md` 为准。
