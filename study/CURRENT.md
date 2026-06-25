@@ -15,6 +15,14 @@
 第三课 `0003：Tool Call 执行链路` 已完成。
 第四课 `0004：AgentHarness 是 Runtime 控制层` 已完成。
 
+## 主计划
+
+```text
+study/MASTER-PLAN.md
+```
+
+`MASTER-PLAN.md` 是唯一权威学习主计划。后续课程、补课、小课和阶段练习都应服务该主计划。
+
 ## 最新 Handoff
 
 ```text
@@ -78,9 +86,10 @@ Pi 的 Session 为什么不是简单聊天记录，而是一个包含 message、
 新会话中请先阅读：
 
 1. `study/README.md`
-2. `study/MISSION.md`
-3. `study/CURRENT.md`
-4. `study/PROGRESS.md`
-5. `study/handoffs/0004-agent-harness-runtime-control.md`
+2. `study/MASTER-PLAN.md`
+3. `study/MISSION.md`
+4. `study/CURRENT.md`
+5. `study/PROGRESS.md`
+6. `study/handoffs/0004-agent-harness-runtime-control.md`
 
 然后从第五课开始。
