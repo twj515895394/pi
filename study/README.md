@@ -47,6 +47,35 @@ PROGRESS.md            当前进度看板
 CURRENT.md             新会话续接入口
 ```
 
+## 博文创作模块
+
+学习过程中，每完成一段完整知识点课程，可以沉淀对应博文草稿，用于强化记忆和对外分享。
+
+博客模块位于：
+
+```text
+study/blogs/
+```
+
+其中：
+
+```text
+study/blogs/README.md                 # 博文索引
+study/blogs/WRITING-GUIDELINES.md     # 博文写作规范
+study/blogs/drafts/                   # 草稿目录
+study/blogs/published/                # 后续发布版目录，可按需创建
+```
+
+写作要求：
+
+```text
+默认一课一篇；
+不暴露真实企业行业方向；
+企业级类比统一使用泛化的金融行业 Agent；
+代码片段可以有，但不能太多；
+文章要包含结论、结构化图表、工程类比和阶段性理解。
+```
+
 ## 新会话应该怎么继续
 
 请按顺序阅读：
@@ -60,12 +89,20 @@ study/PROGRESS.md
 最新的 study/handoffs/*.md
 ```
 
+如果要继续写博文，还应阅读：
+
+```text
+study/blogs/README.md
+study/blogs/WRITING-GUIDELINES.md
+```
+
 其中：
 
 - `MASTER-PLAN.md`：唯一权威学习主计划。
 - `CURRENT.md`：当前学习状态入口。
 - `PROGRESS.md`：全局课程进度表。
 - `handoffs/`：每节课结束后的交接文档。
+- `blogs/`：学习博文草稿与写作规范。
 
 ## 目录结构
 
@@ -85,6 +122,7 @@ study/
 ├── RESOURCES.md                 # 高信任资源
 ├── GLOSSARY.md                  # 术语表，理解后再写入
 ├── NOTES.md                     # 偏好和临时笔记
+├── blogs/                       # 学习博文草稿与写作规范
 ├── handoffs/                    # 每课交接文档
 ├── course-design/               # 课程草案
 ├── lessons/                     # 正式课程材料，HTML 为主
@@ -106,6 +144,7 @@ study/
   -> 更新 reference
   -> 更新 progress/current/handoff
   -> 必要时写 learning-record
+  -> 完整知识点完成后可写博客草稿
 ```
 
 ## 每节课结束后的强制更新
@@ -123,6 +162,13 @@ study/reference/<对应参考资料>.md
 
 ```text
 study/learning-records/<next-id>-<slug>.md
+```
+
+如果本课或本阶段要写博文，则更新：
+
+```text
+study/blogs/README.md
+study/blogs/drafts/<blog-slug>.md
 ```
 
 ## 当前下一步
